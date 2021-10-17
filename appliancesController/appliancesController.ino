@@ -56,7 +56,10 @@ void callback(char* topic, byte* payload, unsigned int length) {
 	int pin_number = doc["pin_number"];
 	int pin_status = doc["status"];
 
-	digitalWrite(pin_names[pin_number], pin_status);
+  Serial.println(pin_number);
+  Serial.println(pin_names[pin_number]);
+
+	digitalWrite(pin_names[pin_number], pin_status ? LOW : HIGH);
 	pins_status[pin_number] = pin_status;
 
 	char buffer[256];
@@ -91,7 +94,7 @@ void setup() {
 	for (int i = 0; i < 9; i++) {
 		Serial.println(pin_names[i]);
 		pinMode(pin_names[i], OUTPUT);
-		digitalWrite(pin_names[i], LOW);
+		digitalWrite(pin_names[i], HIGH);
 	}
 	Serial.begin(115200);
 	setup_wifi();

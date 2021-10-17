@@ -38,7 +38,7 @@ router.post('/', function(req, res, next) {
 					{ user_id: user.id, email: user.email },
 					process.env.JWT_SECRET_KEY,
 					{
-						expiresIn: "2h",
+						expiresIn: "24h",
 					}
 				);
 				// save user token
