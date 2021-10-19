@@ -18,9 +18,9 @@ var commandRouter = require('./routes/command');
 
 var app = express();
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+// // view engine setup
+// app.set('views', path.join(__dirname, 'views'));
+// app.set('view engine', 'jade');
 
 app.use(cors());
 app.use(logger('dev'));
@@ -28,6 +28,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'adminPanel/build')));
 
 app.use('/', indexRouter);
 app.use('/admin', adminRouter);
@@ -38,7 +39,6 @@ app.use('/api/categories', categoriesRouter);
 app.use('/api/appliances', appliancesRouter);
 app.use('/api/command', commandRouter);
 
-app.use(express.static(path.join(__dirname, 'admin-panel/build')));
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
 	next(createError(404));

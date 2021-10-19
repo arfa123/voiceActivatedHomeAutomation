@@ -3,7 +3,7 @@ const path = require('path');
 var router = express.Router();
 
 router.get('/', function(req, res, next) {
-	res.sendFile(path.join(__dirname, '../admin-panel/build/index.html'));
+	res.sendFile(path.join(__dirname, '../adminPanel/build/index.html'));
 });
 
 router.get('/:params', function(req, res, next) {
