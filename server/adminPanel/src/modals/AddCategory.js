@@ -17,10 +17,14 @@ const AddCategory = (props) => {
 	const { globalState } = useContext(GlobalContext);
 
 	const onAddCategory = async () => {
+		const { setError, onHide } = props;
 		const errors = [];
 		if (!name) errors.push("Please Enter Name");
 
-		if (errors.length > 0) return;
+		if (errors.length > 0) {
+			setError(errors[0]);
+			return;
+		}
 
 		if (globalState.token) {
 			setLoading(true);
@@ -28,8 +32,13 @@ const AddCategory = (props) => {
 			const res = await addCategory(globalState.token, payload);
 
 			setLoading(false);
+			
 			if (res.data) {
-
+				onHide();
+			} else if (res.error) {
+				setError(res.error);
+			} else {
+				props.setError("Failed to add category");
 			}
 		} else {
 			history.push("/");

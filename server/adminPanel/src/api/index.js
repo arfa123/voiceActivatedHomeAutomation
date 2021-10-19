@@ -1,4 +1,4 @@
-const BASE_URL = "http://192.168.1.18:3000";
+const BASE_URL = "http://localhost:3000";
 
 export const loginUser = async (data) => {
 	const reqObj = {
@@ -24,7 +24,22 @@ export const getAppliances = async (token) => {
 		return await callApi(reqObj, "/api/appliances", token);
 
 	} catch (e) {
-		console.log("login api failed: ", e);
+		console.log("getAppliances api failed: ", e);
+		return {};
+	}
+};
+
+export const addAppliance = async (token, data) => {
+	const reqObj = {
+		method: "POST",
+		body: JSON.stringify(data)
+	};
+
+	try {
+		return await callApi(reqObj, "/api/appliances", token);
+
+	} catch (e) {
+		console.log("addAppliance api failed: ", e);
 		return {};
 	}
 };

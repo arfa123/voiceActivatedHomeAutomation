@@ -5,16 +5,19 @@ import {
 	Col,
 	Form,
 	Button,
+	Spinner
 } from 'react-bootstrap';
 import { useHistory } from "react-router-dom";
 import { loginUser } from "../api";
 import { GlobalContext } from "../context/GlobalState";
+import ErrorMessage from "../modals/ErrorMessage";
 
 const Login = () => {
 
 	const [ email, setEmail ] = useState("admin@abc.com");
 	const [ password, setPassword ] = useState("admin123");
 	const [ loading, setLoading ] = useState(false);
+	const [ error, setError ] = useState("");
 	const history = useHistory();
 	const { userLoggedIn } = useContext(GlobalContext);
 
@@ -23,11 +26,20 @@ const Login = () => {
 		if (!email) errors.push("Please Enter Eamil");
 		if (!password) errors.push("Please Enter Password");
 
-		if (errors.length > 0) return;
+		if (errors.length > 0) {
+			setError(errors[0]);
+			return;
+		}
 		
 		setLoading(true);
 		const payload = { email, password };
 		const res = await loginUser(payload);
+
+		if (res.error) {
+			setError(res.error);
+			setLoading(false);
+			return;
+		}
 
 		if (res.data) {
 			userLoggedIn(res.data);
@@ -37,6 +49,11 @@ const Login = () => {
 
 	return (
 		<div style={{width: "100vw", height: "100vh", alignItems: "center", display: "flex"}}>
+			<ErrorMessage
+				message={error}
+				show={error ? true : false}
+				onClose={() => setError("")}
+			/>
 			<Container>
 				<Row>
 					<Col></Col>
@@ -52,7 +69,16 @@ const Login = () => {
 							<Row>
 								<Col></Col>
 								<Col>
-									<Button variant="primary" type="button" onClick={onLogin}>
+									<Button variant="primary" type="button" onClick={onLogin} disabled={loading}>
+										{loading &&
+											<Spinner
+												as="span"
+												animation="border"
+												size="sm"
+												role="status"
+												aria-hidden="true"
+											/>
+										}
 										Login
 									</Button>
 								</Col>

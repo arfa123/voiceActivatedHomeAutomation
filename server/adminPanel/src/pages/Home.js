@@ -15,16 +15,20 @@ import CategoriesList from "../modals/CategoriesList";
 import AddCategory from "../modals/AddCategory";
 import RoomsList from "../modals/RoomsList";
 import AddRoom from "../modals/AddRoom";
+import AddAppliance from "../modals/AddAppliance";
+import ErrorMessage from "../modals/ErrorMessage";
 
 const Home = () => {
 
 	const [ appliances, setAppliances ] = useState([]);
+	const [ error, setError ] = useState("");
 	const [ usersListVisible, setUsersListVisible ] = useState(false);
 	const [ addUserVisible, setAddUserVisible ] = useState(false);
 	const [ categoriesListVisible, setCategoriesListVisible ] = useState(false);
 	const [ addCategoryVisible, setAddCategoryVisible ] = useState(false);
 	const [ roomsListVisible, setRoomsListVisible ] = useState(false);
 	const [ addRoomVisible, setAddRoomVisible ] = useState(false);
+	const [ addApplianceVisible, setAddApplianceVisible ] = useState(false);
 	const history = useHistory();
 	const { globalState } = useContext(GlobalContext);
 
@@ -46,6 +50,11 @@ const Home = () => {
 
 	return (
 		<>
+			<ErrorMessage
+				message={error}
+				show={error ? true : false}
+				onClose={() => setError("")}
+			/>
 			{usersListVisible &&
 				<UsersList
 					show={usersListVisible}
@@ -56,6 +65,7 @@ const Home = () => {
 				<AddUser
 					show={addUserVisible}
 					onHide={() => setAddUserVisible(false)}
+					setError={setError}
 				/>
 			}
 			{categoriesListVisible &&
@@ -68,6 +78,7 @@ const Home = () => {
 				<AddCategory
 					show={addCategoryVisible}
 					onHide={() => setAddCategoryVisible(false)}
+					setError={setError}
 				/>
 			}
 			{roomsListVisible &&
@@ -80,6 +91,14 @@ const Home = () => {
 				<AddRoom
 					show={addRoomVisible}
 					onHide={() => setAddRoomVisible(false)}
+					setError={setError}
+				/>
+			}
+			{addApplianceVisible &&
+				<AddAppliance
+					show={addApplianceVisible}
+					onHide={() => setAddApplianceVisible(false)}
+					setError={setError}
 				/>
 			}
 			<Navbar collapseOnSelect expand="lg" bg="dark" variant="dark">
@@ -101,7 +120,7 @@ const Home = () => {
 						</NavDropdown>
 					</Nav>
 					<Nav>
-						<Nav.Link href="#deets">Add Appliance</Nav.Link>
+						<Nav.Link onClick={() => setAddApplianceVisible(!addApplianceVisible)}>Add Appliance</Nav.Link>
 					</Nav>
 				</Navbar.Collapse>
 			</Navbar>

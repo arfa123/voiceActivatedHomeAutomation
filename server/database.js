@@ -62,10 +62,11 @@ const db = new sqlite3.Database(DBSOURCE, (err) => {
 		db.run(`CREATE TABLE IF NOT EXISTS appliances (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			status BOOLEAN NOT NULL CHECK (status IN (0, 1)),
-			pin_number INTEGER UNIQUE,
+			pin_number INTEGER,
 			room text,
 			category text,
 			number INTEGER,
+			UNIQUE(room, pin_number)
 			UNIQUE(room, category, number)
 			FOREIGN KEY (category) REFERENCES categories (category_name)
 					ON UPDATE RESTRICT
