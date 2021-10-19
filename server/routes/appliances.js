@@ -4,8 +4,14 @@ var db = require('../database');
 var { verifyToken } = require('../middlewares/auth');
 
 router.get('/', verifyToken, (req, res, next) => {
-	var sql = "SELECT * FROM appliances"
+	var sql = "SELECT * FROM appliances";
 	var params = []
+
+	if (req.query && req.query.room_name) {
+		sql = `${sql} WHERE room = ?`;
+		params.push(req.query.room_name);
+	}
+
 	db.all(sql, params, (err, rows) => {
 		if (err) {
 			res.status(500).json({ "error": err.message });
