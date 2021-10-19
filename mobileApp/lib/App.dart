@@ -2,6 +2,7 @@ import "package:flutter/material.dart";
 import "package:provider/provider.dart";
 import "package:flutter_app/pages/Login.dart";
 import "package:flutter_app/pages/Home.dart";
+import "package:flutter_app/pages/Rooms.dart";
 import "package:flutter_app/pages/Appliances.dart";
 import "package:flutter_app/pages/VoiceCommand.dart";
 import "package:flutter_app/models/auth.dart";
@@ -19,6 +20,7 @@ class App extends StatelessWidget {
 				routes: {
 					"/login": (context) => Login(),
 					"/home": (context) => Home(),
+					"/rooms": (context) => Rooms(),
 					"/appliances": (context) => Appliances(),
 					"/voice_command": (context) => VoiceCommand()
 				},

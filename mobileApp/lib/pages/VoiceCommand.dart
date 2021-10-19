@@ -4,7 +4,6 @@ import 'dart:math';
 import 'dart:async';
 import "package:provider/provider.dart";
 import "package:flutter_app/models/auth.dart";
-import "package:flutter_app/models/appliance.dart";
 import 'dart:convert' as convert;
 import 'package:http/http.dart' as http;
 
@@ -28,10 +27,20 @@ class VoiceCommandState extends State<VoiceCommand> {
 	int resultListened = 0;
 	List<LocaleName> _localeNames = [];
 	final SpeechToText speech = SpeechToText();
+	final GlobalKey<ScaffoldMessengerState> _scaffoldMessengerKey = GlobalKey<ScaffoldMessengerState>();
 
 	@override
 	void initState() {
+		initSpeechState();
 		super.initState();
+	}
+
+	showDialog(String message) {
+		final snackBar = SnackBar(
+			content: Text(message, style: TextStyle(color: Colors.white)),
+			backgroundColor: Colors.red,
+		);
+		_scaffoldMessengerKey.currentState!.showSnackBar(snackBar);
 	}
 
 	sendVoiceCommand(String recognizedWords) async {
@@ -42,25 +51,31 @@ class VoiceCommandState extends State<VoiceCommand> {
 
 		try{
 			final String accessToken = Provider.of<AuthModel>(context, listen: false).userData.accessToken;
+			final String serverUrl = Provider.of<AuthModel>(context, listen: false).serverUrl;
 			var response = await http.post(
-				Uri.parse('http://192.168.1.12:3000/api/command'),
+				Uri.parse('http://$serverUrl:3000/api/command'),
 				headers: {
 					'x-access-token': accessToken,
 				},
 				body: payload
 			);
-			print('Response status: ${response.statusCode} ${response.statusCode == 200}');
+			print('Response status: ${response.statusCode}');
 			print('Response body: ${response.body}');
 
 			if (response.statusCode == 200) {
-				
+				showDialog('Specified action has been processed successfully');
+			} else {
+				final responseJson = convert.jsonDecode(response.body);
+				final error = responseJson['error'];
+				showDialog(error);
 			}
 
 		} on PlatformException catch (error)  {
 			List<String> errors = error.toString().split(',');
-			// showDialog(errors[1]);
+			showDialog(errors[1]);
 		} catch(e) {
 			print("sendVoiceCommand error: $e");
+			showDialog(e.toString());
 		}
 	}
 
@@ -85,155 +100,157 @@ class VoiceCommandState extends State<VoiceCommand> {
 	}
 
 	Widget build(BuildContext context) {
-		return Scaffold(
-			appBar: AppBar(
-				title: Text("Voice Activated Home Automation"),
-				centerTitle: true,
-			),
-			body: Column(children: [
-			Center(
-				child: Text(
-					'Speech recognition available',
-					style: TextStyle(fontSize: 22.0),
+		return ScaffoldMessenger(
+			key: _scaffoldMessengerKey,
+			child: Scaffold(
+				appBar: AppBar(
+					title: Text("Voice Activated Home Automation"),
+					centerTitle: true,
 				),
-			),
-			Container(
-				child: Column(
-				children: <Widget>[
-					Row(
-					mainAxisAlignment: MainAxisAlignment.spaceAround,
-					children: <Widget>[
-						TextButton(
-							onPressed: _hasSpeech ? null : initSpeechState,
-							child: Text('Initialize'),
-						),
-					],
-					),
-					Row(
-					mainAxisAlignment: MainAxisAlignment.spaceAround,
-					children: <Widget>[
-						TextButton(
-						onPressed: !_hasSpeech || speech.isListening
-							? null
-							: startListening,
-						child: Text('Start'),
-						),
-						TextButton(
-						onPressed: speech.isListening ? stopListening : null,
-						child: Text('Stop'),
-						),
-						TextButton(
-						onPressed: speech.isListening ? cancelListening : null,
-						child: Text('Cancel'),
-						),
-					],
-					),
-					Row(
-					mainAxisAlignment: MainAxisAlignment.spaceAround,
-					children: <Widget>[
-						DropdownButton(
-						onChanged: (selectedVal) => _switchLang(selectedVal),
-						value: _currentLocaleId,
-						items: _localeNames
-							.map(
-								(localeName) => DropdownMenuItem(
-								value: localeName.localeId,
-								child: Text(localeName.name),
-								),
-							)
-							.toList(),
-						),
-					],
-					)
-				],
-				),
-			),
-			Expanded(
-				flex: 4,
-				child: Column(
-				children: <Widget>[
+				body: Column(children: [
 					Center(
-					child: Text(
-						'Recognized Words',
-						style: TextStyle(fontSize: 22.0),
+						child: Text(
+							'Speech recognition available',
+							style: TextStyle(fontSize: 22.0),
+						),
 					),
+					Container(
+						child: Column(
+							children: <Widget>[
+								Row(
+									mainAxisAlignment: MainAxisAlignment.spaceAround,
+									children: <Widget>[
+										TextButton(
+											onPressed: _hasSpeech ? null : initSpeechState,
+											child: Text('Initialize'),
+										),
+									],
+								),
+								Row(
+									mainAxisAlignment: MainAxisAlignment.spaceAround,
+									children: <Widget>[
+										TextButton(
+											onPressed: !_hasSpeech || speech.isListening
+												? null
+												: startListening,
+											child: Text('Start'),
+										),
+										TextButton(
+											onPressed: speech.isListening ? stopListening : null,
+											child: Text('Stop'),
+										),
+										TextButton(
+											onPressed: speech.isListening ? cancelListening : null,
+											child: Text('Cancel'),
+										),
+									],
+								),
+								Row(
+									mainAxisAlignment: MainAxisAlignment.spaceAround,
+									children: <Widget>[
+										DropdownButton(
+											onChanged: (selectedVal) => _switchLang(selectedVal),
+											value: _currentLocaleId,
+											items: _localeNames
+												.map(
+													(localeName) => DropdownMenuItem(
+													value: localeName.localeId,
+													child: Text(localeName.name),
+													),
+												)
+												.toList(),
+										),
+									],
+								)
+							],
+						),
 					),
 					Expanded(
-					child: Stack(
-						children: <Widget>[
-						Container(
-							color: Theme.of(context).selectedRowColor,
-							child: Center(
-							child: Text(
-								lastWords,
-								textAlign: TextAlign.center,
-							),
-							),
-						),
-						Positioned.fill(
-							bottom: 10,
-							child: Align(
-							alignment: Alignment.bottomCenter,
-							child: Container(
-								width: 40,
-								height: 40,
-								alignment: Alignment.center,
-								decoration: BoxDecoration(
-								boxShadow: [
-									BoxShadow(
-										blurRadius: .26,
-										spreadRadius: level * 1.5,
-										color: Colors.black.withOpacity(.05))
-								],
-								color: Colors.white,
-								borderRadius:
-									BorderRadius.all(Radius.circular(50)),
+						flex: 4,
+						child: Column(
+							children: <Widget>[
+								Center(
+									child: Text(
+										'Recognized Words',
+										style: TextStyle(fontSize: 22.0),
+									),
 								),
-								child: IconButton(
-								icon: Icon(Icons.mic),
-								onPressed: () => null,
+								Expanded(
+									child: Stack(
+										children: <Widget>[
+											Container(
+												color: Theme.of(context).selectedRowColor,
+												child: Center(
+													child: Text(
+														lastWords,
+														textAlign: TextAlign.center,
+													),
+												),
+											),
+											Positioned.fill(
+												bottom: 10,
+												child: Align(
+													alignment: Alignment.bottomCenter,
+													child: Container(
+														width: 40,
+														height: 40,
+														alignment: Alignment.center,
+														decoration: BoxDecoration(
+															boxShadow: [
+																BoxShadow(
+																	blurRadius: .26,
+																	spreadRadius: level * 1.5,
+																	color: Colors.black.withOpacity(.05))
+															],
+															color: Colors.white,
+															borderRadius: BorderRadius.all(Radius.circular(50)),
+														),
+														child: IconButton(
+															icon: Icon(Icons.mic),
+															onPressed: () => null,
+														),
+													),
+												),
+											),
+										],
+									),
 								),
-							),
-							),
+							],
 						),
-						],
 					),
-					),
-				],
-				),
-			),
-			Expanded(
-				flex: 1,
-				child: Column(
-				children: <Widget>[
-					Center(
-					child: Text(
-						'Error Status',
-						style: TextStyle(fontSize: 22.0),
-					),
-					),
-					Center(
-					child: Text(lastError),
-					),
-				],
-				),
-			),
-			Container(
-				padding: EdgeInsets.symmetric(vertical: 20),
-				color: Theme.of(context).backgroundColor,
-				child: Center(
-				child: speech.isListening
-					? Text(
-						"I'm listening...",
-						style: TextStyle(fontWeight: FontWeight.bold),
-						)
-					: Text(
-						'Not listening',
-						style: TextStyle(fontWeight: FontWeight.bold),
+					Expanded(
+						flex: 1,
+						child: Column(
+							children: <Widget>[
+								Center(
+									child: Text(
+										'Error Status',
+										style: TextStyle(fontSize: 22.0),
+									),
+								),
+								Center(
+									child: Text(lastError),
+								),
+							],
 						),
-				),
-			),
-			]),
+					),
+					Container(
+						padding: EdgeInsets.symmetric(vertical: 20),
+						color: Theme.of(context).backgroundColor,
+						child: Center(
+							child: speech.isListening
+								? Text(
+									"I'm listening...",
+									style: TextStyle(fontWeight: FontWeight.bold),
+									)
+								: Text(
+									'Not listening',
+									style: TextStyle(fontWeight: FontWeight.bold),
+									),
+						),
+					),
+				]),
+			)
 		);
 	}
 

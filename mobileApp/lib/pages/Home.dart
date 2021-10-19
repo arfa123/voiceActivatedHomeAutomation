@@ -16,7 +16,7 @@ class Home extends StatelessWidget {
 							style: ElevatedButton.styleFrom(
 								padding: EdgeInsets.symmetric(horizontal: 16, vertical: 26)
 							),
-							onPressed: () {navigate(context, '/appliances');},
+							onPressed: () {navigate(context, '/rooms');},
 							child: const Text("View Appliances", style: TextStyle(fontSize: 24.0))
 						)
 					),

@@ -2,8 +2,8 @@ import "package:flutter/material.dart";
 
 // Size deviceDim;
 
-navigate(BuildContext context, String routeName) {
-	Navigator.pushNamed(context, routeName);
+navigate(BuildContext context, String routeName, { dynamic params = null }) {
+	Navigator.pushNamed(context, routeName, arguments: params);
 }
 
 navigateClearStack(BuildContext context, String routeName){

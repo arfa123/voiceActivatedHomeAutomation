@@ -10,9 +10,11 @@ class Appliances extends StatelessWidget {
 
 	Future<List<Appliance>> fetchAppliances(BuildContext context) async {
 		final String accessToken = Provider.of<AuthModel>(context, listen: false).userData.accessToken;
+		final String serverUrl = Provider.of<AuthModel>(context, listen: false).serverUrl;
+		final dynamic roomName = ModalRoute.of(context)!.settings.arguments;
 
 		final response = await http.get(
-			Uri.parse('http://192.168.1.12:3000/api/appliances'),
+			Uri.parse('http://$serverUrl:3000/api/appliances?room_name=$roomName'),
 			headers: {
 				'x-access-token': accessToken,
 			},
@@ -41,9 +43,32 @@ class Appliances extends StatelessWidget {
 						return ListView.builder(
 							itemCount: snapshot.data!.length,
 							itemBuilder: (context, index) {
-								return Padding(
-									padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-									child: Text(snapshot.data![index].name)
+								return Container(
+									padding: const EdgeInsets.all(20),
+									child: Row(
+										mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+										children: [
+											Column(
+												children: [
+													snapshot.data![index].category == 'light'
+														? Icon(Icons.lightbulb, color: Colors.green[500])
+														: Icon(Icons.radio_button_checked, color: Colors.green[500])
+												],
+											),
+											Column(
+												children: [
+													Text(snapshot.data![index].name),
+												],
+											),
+											Column(
+												children: [
+													snapshot.data![index].status == 1
+														? Icon(Icons.toggle_on, color: Colors.green[500])
+														: Icon(Icons.toggle_off, color: Colors.red[500])
+												],
+											),
+										],
+									),
 								);
 							}
 						);

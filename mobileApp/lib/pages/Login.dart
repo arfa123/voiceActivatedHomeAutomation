@@ -13,11 +13,13 @@ class Login extends StatefulWidget {
 }
 
 class LoginState extends State<Login> {
+	TextEditingController serverUrlCtrl = TextEditingController();
 	TextEditingController emailCtrl = TextEditingController();
 	TextEditingController passwordCtrl = TextEditingController();
 	final GlobalKey<FormState> _loginFormKey = GlobalKey<FormState>();
 
 	signinUser(context) async {
+		String serverUrl = serverUrlCtrl.text;
 		String email = emailCtrl.text;
 		String password = passwordCtrl.text;
 		String role = "user";
@@ -30,14 +32,14 @@ class LoginState extends State<Login> {
 
 		try{
 			EasyLoading.show(status: "Loading...");
-			var url = Uri.parse('http://192.168.1.12:3000/api/login');
+			var url = Uri.parse('http://$serverUrl:3000/api/login');
 			var response = await http.post(url, body: payload);
 			print('Response status: ${response.statusCode} ${response.statusCode == 200}');
 			print('Response body: ${response.body}');
 
 			if (response.statusCode == 200) {
 				UserData userData = UserData.fromJson(convert.jsonDecode(response.body));
-				Provider.of<AuthModel>(context, listen: false).userLogedIn(userData);
+				Provider.of<AuthModel>(context, listen: false).userLogedIn(userData, serverUrl);
 				navigateClearStack(context, "/home");
 			}
 			EasyLoading.dismiss();
@@ -63,6 +65,23 @@ class LoginState extends State<Login> {
 				child: Column(
 					crossAxisAlignment: CrossAxisAlignment.center,
 					children: [
+						Padding(
+							padding: const EdgeInsets.symmetric(horizontal: 20.0),
+							child: TextFormField(
+								controller: serverUrlCtrl,
+								decoration: const InputDecoration(
+									icon: Icon(Icons.link),
+									labelText: 'Server Url',
+								),
+								// The validator receives the text that the user has entered.
+								validator: (value) {
+									if (value == null || value.isEmpty) {
+										return 'Please Enter Server Url';
+									}
+									return null;
+								},
+							),
+						),
 						Padding(
 							padding: const EdgeInsets.symmetric(horizontal: 20.0),
 							child: TextFormField(
