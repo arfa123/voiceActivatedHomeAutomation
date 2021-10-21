@@ -35,10 +35,10 @@ class VoiceCommandState extends State<VoiceCommand> {
 		super.initState();
 	}
 
-	showDialog(String message) {
+	showDialog(String message, { String type = "success" }) {
 		final snackBar = SnackBar(
 			content: Text(message, style: TextStyle(color: Colors.white)),
-			backgroundColor: Colors.red,
+			backgroundColor: type == "error" ? Colors.red : Colors.green
 		);
 		_scaffoldMessengerKey.currentState!.showSnackBar(snackBar);
 	}
@@ -67,15 +67,15 @@ class VoiceCommandState extends State<VoiceCommand> {
 			} else {
 				final responseJson = convert.jsonDecode(response.body);
 				final error = responseJson['error'];
-				showDialog(error);
+				showDialog(error, type: "error");
 			}
 
 		} on PlatformException catch (error)  {
 			List<String> errors = error.toString().split(',');
-			showDialog(errors[1]);
+			showDialog(errors[1], type: "error");
 		} catch(e) {
 			print("sendVoiceCommand error: $e");
-			showDialog(e.toString());
+			showDialog(e.toString(), type: "error");
 		}
 	}
 
