@@ -2,15 +2,17 @@ import React, { useEffect, useContext, useState } from "react";
 import {
 	Modal,
 	Button,
-	Table
+	Table,
+	Spinner
 } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalState";
-import { getUsers } from "../api";
+import { getUsers, deleteUser } from "../api";
 
 const UsersList = (props) => {
 
 	const [users, setUsers] = useState([]);
+	const [loading, setLoading] = useState(false);
 	const history = useHistory();
 	const { globalState } = useContext(GlobalContext);
 
@@ -28,7 +30,31 @@ const UsersList = (props) => {
 		};
 
 		getUsersList();
-	}, []);
+	}, [history, globalState.token]);
+
+	const onDeleteUser = async (userId) => {
+		const { setError, onHide } = props;
+
+		if (globalState.token) {
+			if (userId) {
+				setLoading(true);
+				const res = await deleteUser(globalState.token, userId);
+				setLoading(false);
+	
+				if (res.data) {
+					onHide();
+				} else if (res.error) {
+					setError(res.error);
+				} else {
+					setError("Failed to delete user");
+				}
+			} else {
+				setError("Failed to delete user, Invalid user");
+			}
+		} else {
+			history.push("/");
+		}
+	};
 
 	return (
 		<Modal
@@ -46,18 +72,37 @@ const UsersList = (props) => {
 				<Table responsive>
 					<thead>
 						<tr>
+							<th>ID</th>
 							<th>Name</th>
 							<th>Email</th>
 							<th>Role</th>
+							<th></th>
 						</tr>
 					</thead>
 					<tbody>
 						{users.map((user, index) => {
 							return (
 								<tr key={index}>
+									<td>{user.id}</td>
 									<td>{user.name}</td>
 									<td>{user.email}</td>
 									<td>{user.role}</td>
+									<td>
+										{user.role === "user" &&
+											<Button variant="danger" size="sm" onClick={() => onDeleteUser(user.id)}>
+												{loading &&
+													<Spinner
+														as="span"
+														animation="border"
+														size="sm"
+														role="status"
+														aria-hidden="true"
+													/>
+												}
+												Delete
+											</Button>
+										}
+									</td>
 								</tr>
 							);
 						})}

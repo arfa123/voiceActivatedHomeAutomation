@@ -62,7 +62,7 @@ const AddRoom = (props) => {
 					<Form.Group className="mb-3" controlId="formBasicName">
 						<Form.Control required type="name" placeholder="Enter Room Name" onChange={(e) => setName(e.target.value)} value={name} />
 					</Form.Group>
-					<Button variant="primary" type="submit" onClick={onAddRoom} disabled={loading}>
+					<Button variant="primary" type="button" onClick={onAddRoom} disabled={loading}>
 						{loading &&
 							<Spinner
 								as="span"

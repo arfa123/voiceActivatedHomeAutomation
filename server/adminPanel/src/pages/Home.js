@@ -4,11 +4,13 @@ import {
 	Navbar,
 	Table,
 	Badge,
+	Button,
+	Spinner,
 	NavDropdown
 } from 'react-bootstrap';
 import { useHistory } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalState";
-import { getAppliances } from "../api";
+import { getAppliances, deleteAppliance } from "../api";
 import UsersList from "../modals/UsersList";
 import AddUser from "../modals/AddUser";
 import CategoriesList from "../modals/CategoriesList";
@@ -21,6 +23,7 @@ import ErrorMessage from "../modals/ErrorMessage";
 const Home = () => {
 
 	const [ appliances, setAppliances ] = useState([]);
+	const [loading, setLoading] = useState(false);
 	const [ error, setError ] = useState("");
 	const [ usersListVisible, setUsersListVisible ] = useState(false);
 	const [ addUserVisible, setAddUserVisible ] = useState(false);
@@ -33,20 +36,42 @@ const Home = () => {
 	const { globalState } = useContext(GlobalContext);
 
 	useEffect(() => {
-
-		const getAppliancesList = async () => {
-			if (globalState.token) {
-				const res = await getAppliances(globalState.token);
-				if (res && res.data && Array.isArray(res.data) && res.data.length) {
-					setAppliances(res.data);
-				}
-			} else {
-				history.push("/");
-			}
-		};
-
 		getAppliancesList();
 	}, []);
+
+	const getAppliancesList = async () => {
+		if (globalState.token) {
+			const res = await getAppliances(globalState.token);
+			if (res && res.data && Array.isArray(res.data) && res.data.length) {
+				setAppliances(res.data);
+			}
+		} else {
+			history.push("/");
+		}
+	};
+
+	const onDeleteAppliance = async (roomName) => {
+
+		if (globalState.token) {
+			if (roomName) {
+				setLoading(true);
+				const res = await deleteAppliance(globalState.token, roomName);
+				setLoading(false);
+
+				if (res.data) {
+					getAppliancesList();
+				} else if (res.error) {
+					setError(res.error);
+				} else {
+					setError("Failed to delete appliance");
+				}
+			} else {
+				setError("Failed to delete appliance, Invalid appliance");
+			}
+		} else {
+			history.push("/");
+		}
+	};
 
 	return (
 		<>
@@ -59,6 +84,7 @@ const Home = () => {
 				<UsersList
 					show={usersListVisible}
 					onHide={() => setUsersListVisible(false)}
+					setError={setError}
 				/>
 			}
 			{addUserVisible &&
@@ -72,6 +98,7 @@ const Home = () => {
 				<CategoriesList
 					show={categoriesListVisible}
 					onHide={() => setCategoriesListVisible(false)}
+					setError={setError}
 				/>
 			}
 			{addCategoryVisible &&
@@ -85,6 +112,7 @@ const Home = () => {
 				<RoomsList
 					show={roomsListVisible}
 					onHide={() => setRoomsListVisible(false)}
+					setError={setError}
 				/>
 			}
 			{addRoomVisible &&
@@ -137,6 +165,7 @@ const Home = () => {
 						<th>Room</th>
 						<th>Pin Number</th>
 						<th>Status</th>
+						<th></th>
 					</tr>
 				</thead>
 				<tbody>
@@ -150,6 +179,20 @@ const Home = () => {
 								<td>{appliance.room}</td>
 								<td>{appliance.pin_number}</td>
 								<td>{appliance.status ? "ON" : "OFF"}</td>
+								<td>
+									<Button variant="danger" size="sm" onClick={() => onDeleteAppliance(appliance.id)}>
+										{loading &&
+											<Spinner
+												as="span"
+												animation="border"
+												size="sm"
+												role="status"
+												aria-hidden="true"
+											/>
+										}
+										Delete
+									</Button>
+								</td>
 							</tr>
 						);
 					})}

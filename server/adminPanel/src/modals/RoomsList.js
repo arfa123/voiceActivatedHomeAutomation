@@ -2,15 +2,17 @@ import React, { useEffect, useContext, useState } from "react";
 import {
 	Modal,
 	Button,
-	Table
+	Table,
+	Spinner
 } from "react-bootstrap";
 import { useHistory } from "react-router-dom";
 import { GlobalContext } from "../context/GlobalState";
-import { getRooms } from "../api";
+import { getRooms, deleteRoom } from "../api";
 
 const RoomsList = (props) => {
 
 	const [rooms, setRooms] = useState([]);
+	const [loading, setLoading] = useState(false);
 	const history = useHistory();
 	const { globalState } = useContext(GlobalContext);
 
@@ -28,7 +30,31 @@ const RoomsList = (props) => {
 		};
 
 		getRoomsList();
-	}, []);
+	}, [history, globalState.token]);
+
+	const onDeleteRoom = async (roomName) => {
+		const { setError, onHide } = props;
+
+		if (globalState.token) {
+			if (roomName) {
+				setLoading(true);
+				const res = await deleteRoom(globalState.token, roomName);
+				setLoading(false);
+	
+				if (res.data) {
+					onHide();
+				} else if (res.error) {
+					setError(res.error);
+				} else {
+					setError("Failed to delete room");
+				}
+			} else {
+				setError("Failed to delete room, Invalid room");
+			}
+		} else {
+			history.push("/");
+		}
+	};
 
 	return (
 		<Modal
@@ -47,6 +73,7 @@ const RoomsList = (props) => {
 					<thead>
 						<tr>
 							<th>Name</th>
+							<th></th>
 						</tr>
 					</thead>
 					<tbody>
@@ -54,6 +81,20 @@ const RoomsList = (props) => {
 							return (
 								<tr key={index}>
 									<td>{room.room_name}</td>
+									<td>
+										<Button variant="danger" size="sm" onClick={() => onDeleteRoom(room.room_name)}>
+											{loading &&
+												<Spinner
+													as="span"
+													animation="border"
+													size="sm"
+													role="status"
+													aria-hidden="true"
+												/>
+											}
+											Delete
+										</Button>
+									</td>
 								</tr>
 							);
 						})}

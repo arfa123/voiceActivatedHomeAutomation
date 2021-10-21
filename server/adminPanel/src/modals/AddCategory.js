@@ -62,7 +62,7 @@ const AddCategory = (props) => {
 					<Form.Group className="mb-3" controlId="formBasicName">
 						<Form.Control required type="name" placeholder="Enter Category Name" onChange={(e) => setName(e.target.value)} value={name} />
 					</Form.Group>
-					<Button variant="primary" type="submit" onClick={onAddCategory} disabled={loading}>
+					<Button variant="primary" type="button" onClick={onAddCategory} disabled={loading}>
 						{loading &&
 							<Spinner
 								as="span"

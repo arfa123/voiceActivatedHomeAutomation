@@ -44,6 +44,20 @@ export const addAppliance = async (token, data) => {
 	}
 };
 
+export const deleteAppliance = async (token, applianceId) => {
+	const reqObj = {
+		method: "DELETE"
+	};
+
+	try {
+		return await callApi(reqObj, `/api/appliances/${applianceId}`, token);
+
+	} catch (e) {
+		console.log("delete user api failed: ", e);
+		return {};
+	}
+};
+
 export const getUsers = async (token) => {
 	const reqObj = {
 		method: "GET"
@@ -69,6 +83,20 @@ export const addUser = async (token, data) => {
 
 	} catch (e) {
 		console.log("add user api failed: ", e);
+		return {};
+	}
+};
+
+export const deleteUser = async (token, userId) => {
+	const reqObj = {
+		method: "DELETE"
+	};
+
+	try {
+		return await callApi(reqObj, `/api/users/${userId}`, token);
+
+	} catch (e) {
+		console.log("delete user api failed: ", e);
 		return {};
 	}
 };
@@ -102,6 +130,20 @@ export const addCategory = async (token, data) => {
 	}
 };
 
+export const deleteCategory = async (token, categoryName) => {
+	const reqObj = {
+		method: "DELETE"
+	};
+
+	try {
+		return await callApi(reqObj, `/api/categories/${categoryName}`, token);
+
+	} catch (e) {
+		console.log("delete category api failed: ", e);
+		return {};
+	}
+};
+
 export const getRooms = async (token) => {
 	const reqObj = {
 		method: "GET"
@@ -127,6 +169,20 @@ export const addRoom = async (token, data) => {
 
 	} catch (e) {
 		console.log("add room api failed: ", e);
+		return {};
+	}
+};
+
+export const deleteRoom = async (token, roomName) => {
+	const reqObj = {
+		method: "DELETE"
+	};
+
+	try {
+		return await callApi(reqObj, `/api/rooms/${roomName}`, token);
+
+	} catch (e) {
+		console.log("delete room api failed: ", e);
 		return {};
 	}
 };

@@ -42,7 +42,7 @@ const AddUser = (props) => {
 			} else if (res.error) {
 				setError(res.error);
 			} else {
-				props.setError("Failed to add user");
+				setError("Failed to add user");
 			}
 		} else {
 			history.push("/");
@@ -72,7 +72,7 @@ const AddUser = (props) => {
 					<Form.Group className="mb-3" controlId="formBasicPassword">
 						<Form.Control required type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} value={password} />
 					</Form.Group>
-					<Button variant="primary" type="submit" onClick={onAddUser} disabled={loading}>
+					<Button variant="primary" type="button" onClick={onAddUser} disabled={loading}>
 						{loading &&
 							<Spinner
 								as="span"

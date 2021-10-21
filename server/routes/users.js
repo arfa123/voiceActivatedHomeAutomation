@@ -68,4 +68,35 @@ router.post('/', verifyToken, function (req, res, next) {
 	});
 });
 
+router.delete('/:id', verifyToken, (req, res, next) => {
+	var errors = []
+	if (!req.params.id) {
+		errors.push("No user id specified");
+	}
+	if (errors.length) {
+		res.status(400).json({ "error": errors.join(", ") });
+		return;
+	}
+
+	var sql = `DELETE FROM users WHERE id = ?`;
+
+	db.run(sql, [req.params.id], (err) => {
+		if (err) {
+			res.status(500).json({ "error": err.message });
+			return;
+		}
+		var sql = "SELECT * FROM users";
+		db.all(sql, [], (err, rows) => {
+			if (err) {
+				res.status(400).json({ "error": err.message });
+				return;
+			}
+			res.json({
+				"message": "success",
+				"data": rows
+			});
+		});
+	});
+});
+
 module.exports = router;
