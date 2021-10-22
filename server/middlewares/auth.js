@@ -1,4 +1,5 @@
 var jwt = require('jsonwebtoken');
+var { JWT_SECRET_KEY } = require('../config');
 
 function verifyToken(req, res, next) {
 
@@ -7,7 +8,7 @@ function verifyToken(req, res, next) {
 	if (!token) return res.status(403).send({ message: 'No token provided.' });
 
 	// verifies secret and checks exp
-	jwt.verify(token, process.env.JWT_SECRET_KEY, function(err, decoded) {
+	jwt.verify(token, JWT_SECRET_KEY, function(err, decoded) {
 		if (err) return res.status(401).send({ message: 'Failed to authenticate token.' });
 
 		// if everything is good, save to request for use in other routes

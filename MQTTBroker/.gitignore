@@ -7,6 +7,7 @@
 
 # production
 /bin
+/dist
 
 # misc
 .env

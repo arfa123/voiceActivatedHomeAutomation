@@ -3,6 +3,7 @@ var md5 = require("md5");
 var jwt = require("jsonwebtoken");
 var router = express.Router();
 var db = require('../database');
+var { JWT_SECRET_KEY } = require('../config');
 
 /* GET users listing. */
 router.post('/', function(req, res, next) {
@@ -36,7 +37,7 @@ router.post('/', function(req, res, next) {
 	
 				const token = jwt.sign(
 					{ user_id: user.id, email: user.email },
-					process.env.JWT_SECRET_KEY,
+					JWT_SECRET_KEY,
 					{
 						expiresIn: "24h",
 					}

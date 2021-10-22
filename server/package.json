@@ -22,5 +22,12 @@
   },
   "devDependencies": {
     "nodemon": "^2.0.12"
-  }
+  },
+  "pkg": {
+    "scripts": "bin/www",
+    "assets": ["db.sqlite", "adminPanel/build", "./node_modules/sqlite3/lib/binding/**/*"],
+    "targets": [ "node14-win-x64", "node14-linux-arm64" ],
+    "outputPath": "dist"
+  },
+  "bin": "bin/www"
 }
