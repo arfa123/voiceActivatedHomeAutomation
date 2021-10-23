@@ -5,6 +5,7 @@
  */
 
 var app = require('../app');
+var MQTTBroker = require('../MQTTBroker');
 var debug = require('debug')('voiceprojectsever:server');
 var http = require('http');
 
@@ -20,6 +21,11 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
+var MQTTBrokerServer = require('net').createServer(MQTTBroker.handle);
+
+MQTTBrokerServer.listen(1883, function () {
+	console.log('MQTTBroker server started and listening on port 1883');
+});
 
 /**
  * Listen on provided port, on all network interfaces.
