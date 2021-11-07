@@ -5,7 +5,7 @@
  */
 
 var app = require('../app');
-var MQTTBroker = require('../MQTTBroker');
+var MQTTBroker = require('../mqttBroker');
 var debug = require('debug')('voiceprojectsever:server');
 var http = require('http');
 
